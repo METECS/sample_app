@@ -361,9 +361,23 @@ void SAMPLE_ReportHousekeeping( const CCSDS_CommandPacket_t *Msg )
 
     /*
     ** Send housekeeping telemetry packet...
-    */
-    CFE_SB_TimeStampMsg((CFE_SB_Msg_t *) &Sample_AppData.SAMPLE_HkTelemetryPkt);
-    CFE_SB_SendMsg((CFE_SB_Msg_t *) &Sample_AppData.SAMPLE_HkTelemetryPkt);
+    */ 
+    {
+        /*
+         * Create and use a temporary structure to ensure type alignment
+         */
+        CFE_SB_Msg_t tempMessage;
+	memcpy(&tempMessage, &Sample_AppData.SAMPLE_HkTelemetryPkt, sizeof(tempMessage));
+
+        CFE_SB_TimeStampMsg((CFE_SB_Msg_t *) &tempMessage);
+        CFE_SB_SendMsg((CFE_SB_Msg_t *) &tempMessage);
+	
+        /*
+         * Copy the temporary message back to the original source as a good practice
+         * even if not used later
+         */
+        memcpy(&Sample_AppData.SAMPLE_HkTelemetryPkt, &tempMessage, sizeof(tempMessage));
+    }
 
     /*
     ** Manage any pending table loads, validations, etc.
