@@ -65,12 +65,15 @@ typedef SAMPLE_NoArgsCmd_t      SAMPLE_Process_t;
 */
 typedef struct
 {
-    uint8              TlmHeader[CFE_SB_TLM_HDR_SIZE];
+    union {
+        uint8          TlmHeader[CFE_SB_TLM_HDR_SIZE];
+        uint32         align;
+    } align;
     uint8              sample_command_error_count;
     uint8              sample_command_count;
     uint8              spare[2];
 
-} OS_PACK sample_hk_tlm_t;
+} sample_hk_tlm_t;
 
 #endif /* _sample_app_msg_h_ */
 
